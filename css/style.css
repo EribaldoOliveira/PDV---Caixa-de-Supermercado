@@ -24,11 +24,6 @@ h1 {
   margin-bottom: 20px;
 }
 
-h2 {
-  color: #007bff;
-  margin-bottom: 10px;
-}
-
 section {
   background-color: #fafafa;
   padding: 15px;
@@ -90,5 +85,21 @@ ul li {
 
   #recibo-impressao {
     display: block !important;
+    font-family: monospace;
+    font-size: 12px;
+    line-height: 1.4;
+    padding: 10px;
+  }
+
+  #recibo-impressao ul {
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+  }
+
+  #recibo-impressao li {
+    border: none;
+    padding: 2px 0;
   }
 }
+

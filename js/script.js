@@ -1,88 +1,100 @@
 let itens = [];
 
-    function adicionarItem() {
-      const nome = document.getElementById("produto-nome").value;
-      const quantidade = parseInt(document.getElementById("produto-quantidade").value);
-      const preco = parseFloat(document.getElementById("produto-preco").value);
+function adicionarItem() {
+  const nome = document.getElementById('produto-nome').value;
+  const qtd = parseInt(document.getElementById('produto-quantidade').value);
+  const preco = parseFloat(document.getElementById('produto-preco').value);
 
-      if (nome && quantidade > 0 && preco >= 0) {
-        itens.push({ nome, quantidade, preco });
-        atualizarLista();
-        calcularTotais();
+  if (!nome || qtd <= 0 || preco <= 0) return alert('Preencha todos os campos corretamente.');
 
-        document.getElementById("produto-nome").value = "";
-        document.getElementById("produto-quantidade").value = "";
-        document.getElementById("produto-preco").value = "";
-      }
-    }
+  const item = { nome, qtd, preco, total: qtd * preco };
+  itens.push(item);
 
-    function atualizarLista() {
-      const lista = document.getElementById("lista-itens");
-      lista.innerHTML = "";
-      itens.forEach(item => {
-        const li = document.createElement("li");
-        li.textContent = `${item.nome} - ${item.quantidade} x R$ ${item.preco.toFixed(2)} = R$ ${(item.quantidade * item.preco).toFixed(2)}`;
-        lista.appendChild(li);
-      });
-    }
+  atualizarLista();
+  calcularTotais();
 
-    function calcularTotais() {
-      const desconto = parseFloat(document.getElementById("desconto").value) || 0;
-      const total = itens.reduce((sum, item) => sum + item.quantidade * item.preco, 0);
-      const totalComDesconto = Math.max(total - desconto, 0);
+  document.getElementById('produto-nome').value = '';
+  document.getElementById('produto-quantidade').value = '';
+  document.getElementById('produto-preco').value = '';
+}
 
-      document.getElementById("total").textContent = total.toFixed(2);
-      document.getElementById("total-com-desconto").textContent = totalComDesconto.toFixed(2);
-    }
+function atualizarLista() {
+  const lista = document.getElementById('lista-itens');
+  lista.innerHTML = '';
 
-    function imprimirRecibo(tipo) {
-      const nomeCliente = document.getElementById("cliente-nome").value || "---";
-      const cpf = document.getElementById("cliente-cpf").value || "---";
-      const cnpj = document.getElementById("cliente-cnpj").value || "---";
-      const desconto = parseFloat(document.getElementById("desconto").value) || 0;
-      const pagamento = document.getElementById("meioPagamento").value;
+  itens.forEach(item => {
+    const li = document.createElement('li');
+    li.textContent = `${item.nome} - Qtd: ${item.qtd} - R$ ${(item.total).toFixed(2)}`;
+    lista.appendChild(li);
+  });
+}
 
-      const total = itens.reduce((sum, item) => sum + item.quantidade * item.preco, 0);
-      const totalComDesconto = Math.max(total - desconto, 0);
+function calcularTotais() {
+  const total = itens.reduce((acc, item) => acc + item.total, 0);
+  const desconto = parseFloat(document.getElementById('desconto').value) || 0;
+  const totalComDesconto = total - desconto;
 
-      let reciboHTML = "";
+  document.getElementById('total').textContent = total.toFixed(2);
+  document.getElementById('total-com-desconto').textContent = totalComDesconto.toFixed(2);
+}
 
-      if (tipo === "nota") {
-        reciboHTML += `
-          <h2>Nota Fiscal</h2>
-          <p><strong>Cliente:</strong> ${nomeCliente}</p>
-          <p><strong>CPF:</strong> ${cpf}</p>
-          <p><strong>CNPJ:</strong> ${cnpj}</p>
-          <hr>
-          <ul>
-            ${itens.map(i => `<li>${i.nome} - ${i.quantidade} x R$ ${i.preco.toFixed(2)} = R$ ${(i.quantidade * i.preco).toFixed(2)}</li>`).join('')}
-          </ul>
-          <hr>
-          <p><strong>Desconto:</strong> R$ ${desconto.toFixed(2)}</p>
-          <p><strong>Total:</strong> R$ ${total.toFixed(2)}</p>
-          <p><strong>Total com Desconto:</strong> R$ ${totalComDesconto.toFixed(2)}</p>
-          <p><strong>Pagamento:</strong> ${pagamento}</p>
-        `;
-      } else if (tipo === "termica") {
-        reciboHTML += `
-          <pre style="font-family: monospace; font-size: 12px;">
-********* RECIBO *********
-Cliente: ${nomeCliente}
-CPF: ${cpf}
-CNPJ: ${cnpj}
---------------------------
-${itens.map(i => `${i.nome} (${i.quantidade}x) R$ ${i.preco.toFixed(2)}\nSubtotal: R$ ${(i.quantidade * i.preco).toFixed(2)}`).join('\n--------------------------\n')}
---------------------------
-Desconto: R$ ${desconto.toFixed(2)}
-TOTAL:    R$ ${totalComDesconto.toFixed(2)}
-Pagamento: ${pagamento}
-***************************
-          </pre>
-        `;
-      }
+function imprimirRecibo(tipo) {
+  const nomeCliente = document.getElementById('cliente-nome').value || 'Cliente não informado';
+  const cpf = document.getElementById('cliente-cpf').value || '-';
+  const cnpj = document.getElementById('cliente-cnpj').value || '-';
+  const pagamento = document.getElementById('meioPagamento').value;
+  const desconto = parseFloat(document.getElementById('desconto').value) || 0;
+  const total = itens.reduce((acc, item) => acc + item.total, 0);
+  const totalComDesconto = total - desconto;
 
-      const reciboDiv = document.getElementById("recibo-impressao");
-      reciboDiv.innerHTML = reciboHTML;
+  let reciboHTML = `<h2>${tipo === 'nota' ? 'Nota Fiscal' : 'Recibo Térmico'}</h2>`;
+  reciboHTML += `<p><strong>Cliente:</strong> ${nomeCliente}</p>`;
+  if (cpf) reciboHTML += `<p><strong>CPF:</strong> ${cpf}</p>`;
+  if (cnpj) reciboHTML += `<p><strong>CNPJ:</strong> ${cnpj}</p>`;
+  reciboHTML += `<ul>`;
+  itens.forEach(item => {
+    reciboHTML += `<li>${item.nome} - Qtd: ${item.qtd} - R$ ${(item.total).toFixed(2)}</li>`;
+  });
+  reciboHTML += `</ul>`;
+  reciboHTML += `<p><strong>Desconto:</strong> R$ ${desconto.toFixed(2)}</p>`;
+  reciboHTML += `<p><strong>Total:</strong> R$ ${totalComDesconto.toFixed(2)}</p>`;
+  reciboHTML += `<p><strong>Pagamento:</strong> ${pagamento}</p>`;
+  reciboHTML += `<p>Data: ${new Date().toLocaleString()}</p>`;
 
-      window.print();
-    }
+  const reciboDiv = document.getElementById('recibo-impressao');
+  reciboDiv.innerHTML = reciboHTML;
+
+  window.print();
+}
+
+function imprimirRecibo(tipo) {
+  const nomeCliente = document.getElementById('cliente-nome').value || 'Cliente não informado';
+  const cpf = document.getElementById('cliente-cpf').value || '-';
+  const cnpj = document.getElementById('cliente-cnpj').value || '-';
+  const pagamento = document.getElementById('meioPagamento').value;
+  const desconto = parseFloat(document.getElementById('desconto').value) || 0;
+  const total = itens.reduce((acc, item) => acc + item.total, 0);
+  const totalComDesconto = total - desconto;
+
+  let reciboHTML = `<h2>${tipo === 'nota' ? 'NOTA FISCAL' : 'RECIBO'}</h2>`;
+  reciboHTML += `<p><strong>Cliente:</strong> ${nomeCliente}</p>`;
+  if (cpf) reciboHTML += `<p><strong>CPF:</strong> ${cpf}</p>`;
+  if (cnpj) reciboHTML += `<p><strong>CNPJ:</strong> ${cnpj}</p>`;
+  reciboHTML += `<ul>`;
+  itens.forEach(item => {
+    reciboHTML += `<li>${item.nome} - Qtd: ${item.qtd} - R$ ${(item.total).toFixed(2)}</li>`;
+  });
+  reciboHTML += `</ul>`;
+  reciboHTML += `<p><strong>Desconto:</strong> R$ ${desconto.toFixed(2)}</p>`;
+  reciboHTML += `<p><strong>Total:</strong> R$ ${totalComDesconto.toFixed(2)}</p>`;
+  reciboHTML += `<p><strong>Pagamento:</strong> ${pagamento}</p>`;
+  reciboHTML += `<p><strong>Data:</strong> ${new Date().toLocaleString()}</p>`;
+
+  const reciboDiv = document.getElementById('recibo-impressao');
+  reciboDiv.innerHTML = reciboHTML;
+
+  // Aplica classe de estilo diferente por tipo
+  reciboDiv.className = tipo === 'nota' ? 'nota-fiscal-print' : 'recibo-termico-print';
+
+  window.print();
+}

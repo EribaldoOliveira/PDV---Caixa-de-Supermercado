@@ -8,7 +8,7 @@
   <script src="js/script.js" defer></script>
 </head>
 <body>
-    <div class="container">
+  <div class="container">
     <h1>PDV - Caixa de Supermercado</h1>
 
     <section class="produto-info">
@@ -22,25 +22,37 @@
       <ul id="lista-itens"></ul>
     </section>
 
-    <div class="desconto">
-      Desconto: <input type="number" id="desconto" placeholder="R$" oninput="calcularTotal()" />
+    <div class="cliente-info">
+      <input type="text" id="cliente-nome" placeholder="Nome do Cliente" />
+      <input type="text" id="cliente-cpf" placeholder="CPF" />
+      <input type="text" id="cliente-cnpj" placeholder="CNPJ" />
     </div>
+
+    <div class="desconto">
+      Desconto: <input type="number" id="desconto" placeholder="R$" oninput="calcularTotais()" />
+    </div>
+
     <div class="pagamento">
       Forma de Pagamento:
-      <select id="forma-pagamento">
-        <option value="dinheiro">Dinheiro</option>
-        <option value="cartao">Cartão</option>
-        <option value="pix">PIX</option>
+      <select id="meioPagamento">
+        <option value="Dinheiro">Dinheiro</option>
+        <option value="Cartão">Cartão</option>
+        <option value="PIX">PIX</option>
       </select>
     </div>
 
     <footer>
       <div>Total: R$ <span id="total">0.00</span></div>
+      <div>Total com Desconto: R$ <span id="total-com-desconto">0.00</span></div>
       <div>
         <button onclick="imprimirRecibo('nota')">Nota Fiscal</button>
         <button onclick="imprimirRecibo('termica')">Recibo</button>
       </div>
     </footer>
   </div>
+
+  <!-- Fora da container para impressão -->
+  <div id="recibo-impressao" style="display: none;"></div>
 </body>
 </html>
+
